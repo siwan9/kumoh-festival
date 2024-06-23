@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpSession
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothRequest
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothResponse
+import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothType
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.entity.Booth
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.user.dto.Role
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.user.dto.SessionUser
@@ -39,11 +40,18 @@ class BoothController(val boothService: BoothService) {
                 .body(BasicResponse(200, "success", "create booth success!"))
     }
 
-    @GetMapping("/{booth_id}")
-    fun check(@PathVariable booth_id : Long) : ResponseEntity<out Any>{
+    @GetMapping("/experience/{booth_id}", "/market/{booth_id}")
+    fun check(@PathVariable booth_id : Long, request: HttpServletRequest) : ResponseEntity<out Any>{
+        val requestUri : String = request.requestURI
+
         var boothResponse : BoothResponse
         try{
-            boothResponse = boothService.check(booth_id)
+            if (requestUri.contains("/experience/"))
+                boothResponse = boothService.check(BoothType.experience, booth_id)
+            else if(requestUri.contains("/market"))
+                boothResponse = boothService.check(BoothType.market, booth_id)
+            else
+                throw RuntimeException("invalid boothType")
         } catch (e : RuntimeException){
             return ResponseEntity.badRequest()
                     .body(BasicResponse(400, "error", e.message))

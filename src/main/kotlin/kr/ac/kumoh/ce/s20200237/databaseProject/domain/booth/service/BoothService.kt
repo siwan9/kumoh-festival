@@ -3,6 +3,7 @@ package kr.ac.kumoh.ce.s20200237.databaseProject.post.service
 import jakarta.transaction.Transactional
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothRequest
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothResponse
+import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.dto.BoothType
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.booth.entity.Booth
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.user.dto.Role
 import kr.ac.kumoh.ce.s20200237.databaseProject.domain.user.dto.UserResponse
@@ -25,8 +26,8 @@ class BoothService(val boothRepository: BoothRepository,
     }
 
     @Transactional
-    fun check(booth_id : Long) : BoothResponse {
-        var booth : Booth = boothRepository.findById(booth_id)
+    fun check(booth_type : BoothType, booth_id : Long) : BoothResponse {
+        var booth : Booth = boothRepository.findByIdAndBoothType(booth_id, booth_type)
                 .orElseThrow{throw RuntimeException("booth not found")}
         var user : User = booth.user
         var userResponse = UserResponse(user.username,
